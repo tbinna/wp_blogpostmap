@@ -21,15 +21,15 @@ function initMap(mapId, markers) {
 	});
 
 	for (var i = markers.length - 1; i >= 0; i--) {
-		var markerN = markers[i];
+		var marker = markers[i];
 
-		L.marker(markerN.latLon, {
+		L.marker(marker.latLon, {
 			icon: L.mapbox.marker.icon({
 				'marker-symbol': 'star',
 				'marker-size': 'large'
 			})
 		})
-		.bindPopup('<b>' + markerN.title + '</b><br><a href=\"' + markerN.permalink + '\">' + markerN.permalink + '</a>')
+		.bindPopup('<b>' + marker.title + '</b><br><a href=\"' + marker.permalink + '\">' + marker.permalink + '</a>')
 		.addTo(map);
 	}
 }
