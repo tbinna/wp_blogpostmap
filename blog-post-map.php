@@ -3,7 +3,7 @@
  * Plugin Name: Adventure Tracks Blog Post Map
  * Plugin URI: http://www.adventure-tracks.com
  * Description: Visualze georeferenced posts on a map.
- * Version: 1.0
+ * Version: 1.1
  * Author: Tobi Binna
  * Author URI: http://www.adventure-tracks.com
  * License: GPL2
@@ -11,36 +11,42 @@
 
 $mygpGeotagsGeoMetatags_key = "mygpGeotagsGeoMetatags";
 
+// Make sure we don't expose any info if called directly
+if ( !function_exists( 'add_action' ) ) {
+	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
+	exit;
+}	
 
 /** Define script location */
-if ( !defined('WP_CONTENT_URL') ) {
-	define('AT_BLOGPOSTMAP_PLUGINPATH',get_option('siteurl').'/wp-content/plugins/'.plugin_basename(dirname(__FILE__)).'/');
-	define('AT_BLOGPOSTMAP_PLUGINDIR', ABSPATH.'/wp-content/plugins/'.plugin_basename(dirname(__FILE__)).'/');
-} else {
-	define('AT_BLOGPOSTMAP_PLUGINPATH', WP_CONTENT_URL.'/plugins/'.plugin_basename(dirname(__FILE__)).'/');
-	define('AT_BLOGPOSTMAP_PLUGINDIR', WP_CONTENT_DIR.'/plugins/'.plugin_basename(dirname(__FILE__)).'/');
+define( 'AT_BLOGPOSTMAP_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'AT_BLOGPOSTMAP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
+/**
+ * Enqueue scripts and styles
+ */
+function blog_post_map_scripts() {
+
+	global $wp_styles;
+
+	wp_enqueue_style('blog_post_map', AT_BLOGPOSTMAP_PLUGIN_URL . 'blog_post_map.css');
+	wp_enqueue_script('blog_post_map', AT_BLOGPOSTMAP_PLUGIN_URL . 'blog_post_map.js', array(), false, false );
+
+	// Mapbox style and script
+	wp_enqueue_style('mapbox', 'https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css', array(), '1.6.4');
+	wp_enqueue_script('mapbox', 'https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js', array(), '1.6.4', false );
+
+	// Mapbox fullscreen plugin style and script
+	wp_enqueue_style('mapbox fullscreen', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v0.0.3/leaflet.fullscreen.css', array(), '0.0.3');
+	wp_enqueue_script('mapbox fullscreen', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v0.0.3/Leaflet.fullscreen.min.js', array('mapbox'), '0.0.3', false );
+
+	// Mapbox locate plugin style and script
+	wp_enqueue_style('mapbox locate', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.24.0/L.Control.Locate.css', array(), '0.24.0');
+	wp_enqueue_style('mapbox locate ie', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.21.0/L.Control.Locate.ie.css', array('mapbox locate'), '0.21.0');
+	$wp_styles->add_data( 'mapbox locate', 'conditional', 'IE 9' );
+	wp_enqueue_script('mapbox locate', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.24.0/L.Control.Locate.js', array('mapbox'), '0.24.0', false );
 }
 
-/** Add CSS to html head */
-function addCustomHeaderTags(){	
-  echo '<link rel="stylesheet" type="text/css" href="' . AT_BLOGPOSTMAP_PLUGINPATH . 'blog_post_map.css" />';
-  echo '<link rel="stylesheet" type="text/css" href="https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css" />';
-  echo '<script type="text/javascript" src="https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js"></script>';
-
-  // add the fullscreen plugin
-  echo '<script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v0.0.3/Leaflet.fullscreen.min.js"></script>';
-  echo '<link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v0.0.3/leaflet.fullscreen.css" />';
-
-  // add the locate plugin
-  echo '<script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.24.0/L.Control.Locate.js"></script>';
-  echo '<link href=https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.24.0/L.Control.Locate.css rel="stylesheet" />';
-  echo '<!--[if lt IE 9]>
-  		<link href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.21.0/L.Control.Locate.ie.css" rel="stylesheet" />
-		<![endif]-->';
-} 
-add_action('admin_head', 'addCustomHeaderTags');
-add_action('wp_head', 'addCustomHeaderTags');
-
+add_action('wp_enqueue_scripts', 'blog_post_map_scripts');
 
 
 class Marker {
@@ -63,7 +69,7 @@ function getMap() {
 	global $wp_query, $mygpGeotagsGeoMetatags_key;
 
 	$markers = array();
-	$posts = get_posts();
+	$posts = get_posts(array('numberposts' => 1000, 'meta_key' => $mygpGeotagsGeoMetatags_key, 'post_status' => 'publish'));
 
 	foreach($posts as $post) {
 		$positionData = get_post_meta($post->ID, $mygpGeotagsGeoMetatags_key, true);
@@ -72,54 +78,16 @@ function getMap() {
 		if($positionData['position'] != "") {
 			$dataSplitted = array_map('doubleval', explode(";", $positionData[ 'position' ]));
 		} else {
-			continue; // post seems to have no position set
+			continue; // post seems not to be georeferenced
 		}
 
 		array_push($markers, new Marker(get_the_title($post->ID), get_permalink($post->ID), $dataSplitted));
 	}
 
-	$postId = $wp_query->post->ID;
-	$mapId = 'map' . $postId;
+	$mapId = 'map' . $wp_query->post->ID;
 
 	$html = '<div id="' . $mapId . '" style="width:100%; height:600px;"></div>';
-
-	$html .= '
-	<script>
-	var map = L.mapbox.map("' . $mapId . '", "tbinna.i80746eh")
-	    .setView([47.529, 8.54], 9);
-
-	// center map to feature on click
-	map.featureLayer.on("click", function(e) {
-        map.panTo(e.layer.getLatLng());
-    });
-
-	// hide the feature layer on load
-	map.featureLayer.setFilter(function() { return false; });
-
-	L.control.fullscreen().addTo(map);
-	L.control.locate().addTo(map);
-
-	map.on("zoomend", function() {
-	    if (map.getZoom() >=13) {
-	        map.featureLayer.setFilter(function() { return true; });
-	    } else {
-	        map.featureLayer.setFilter(function() { return false; });
-	    }
-	});';
-
-	// add blog post markers
-	foreach ($markers as $marker) {
-		$html .= 'L.marker(' . json_encode($marker->latLon) . ', {
-			icon: L.mapbox.marker.icon({
-				"marker-symbol": "star",
-				"marker-size": "large"
-			})
-		})
-		.bindPopup("<b>' . $marker->title . '</b><br><a href=\"'. $marker->permalink .'\">' . $marker->permalink . '</a>")
-		.addTo(map);';
-	}
-
-	$html .= '</script>';
+	$html .= '<script type="text/javascript">initMap(' . $mapId . ', ' . json_encode($markers) .');</script>';
 
 	return $html;
 	
@@ -134,10 +102,6 @@ function addMap($content) {
 	$shortcode = '[at_blog_post_map]';
 
 	$html = getMap();
-	if ($html == '') {
-		return str_replace($shortcode, "", $content);
-	}
-
 	$content = str_replace($shortcode, $html, $content);
 
     return $content;
