@@ -9,8 +9,9 @@ function initMap(mapId, markers) {
 	// hide the feature layer on load
 	map.featureLayer.setFilter(function() { return false; });
 
-	//L.control.fullscreen().addTo(map);
-	//L.control.locate().addTo(map);
+	// add additional map controls (plugins)
+	L.control.fullscreen().addTo(map);
+	L.control.locate().addTo(map);
 
 	map.on("zoomend", function() {
 	    if (map.getZoom() >=13) {
