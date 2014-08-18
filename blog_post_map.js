@@ -1,4 +1,7 @@
 function initMap(mapId, markers) {
+
+	L.mapbox.accessToken = 'pk.eyJ1IjoidGJpbm5hIiwiYSI6InpqcW8tT1kifQ.bTs8e9ttuX0jGmNpGobTqg';
+
 	var map = L.mapbox.map(mapId, "tbinna.i80746eh").setView([47.529, 8.54], 2);
 
 	// add additional map controls (plugins)

@@ -32,8 +32,8 @@ function blog_post_map_scripts() {
 	wp_enqueue_script('blog_post_map', AT_BLOGPOSTMAP_PLUGIN_URL . 'blog_post_map.js', array(), false, false );
 
 	// Mapbox style and script
-	wp_enqueue_style('mapbox', 'https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css', array(), '1.6.4');
-	wp_enqueue_script('mapbox', 'https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js', array(), '1.6.4', false );
+	wp_enqueue_style('mapbox', 'https://api.tiles.mapbox.com/mapbox.js/v2.0.1/mapbox.css', array(), '2.0.1');
+	wp_enqueue_script('mapbox', 'https://api.tiles.mapbox.com/mapbox.js/v2.0.1/mapbox.js', array(), '2.0.1', false );
 
 	// Mapbox fullscreen plugin style and script
 	wp_enqueue_style('mapbox fullscreen', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v0.0.3/leaflet.fullscreen.css', array(), '0.0.3');
@@ -90,7 +90,7 @@ function getMap() {
 
 	$mapId = 'map' . $wp_query->post->ID;
 
-	$html = '<div id="' . $mapId . '" style="width:100%; height:600px;"></div>';
+	$html = '<div id="' . $mapId . '" class="blog-post-map"></div>';
 	$html .= '<script type="text/javascript">initMap(' . $mapId . ', ' . json_encode($markers) .');</script>';
 
 	return $html;

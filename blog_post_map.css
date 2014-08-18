@@ -1,3 +1,10 @@
 .page-id-363 .page-header {
 display: none;
 }
+
+.blog-post-map {
+ top:0;
+ bottom:0;
+ width:100%;
+ height: 600px;
+}
