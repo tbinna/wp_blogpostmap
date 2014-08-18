@@ -54,11 +54,13 @@ class Marker {
 	var $title;
 	var $permalink;
 	var $latLon;
+	var $postThumbnailUrl;
 
-	function Marker($title, $permalink, $latLon) {
+	function Marker($title, $permalink, $latLon, $postThumbnailUrl) {
        $this->title = $title;
        $this->permalink = $permalink;
        $this->latLon = $latLon;
+       $this->postThumbnailUrl = $postThumbnailUrl;
    }
 }
 
@@ -81,7 +83,9 @@ function getMap() {
 			continue; // post seems not to be georeferenced
 		}
 
-		array_push($markers, new Marker(get_the_title($post->ID), get_permalink($post->ID), $dataSplitted));
+		$postThumbnailUrl = wp_get_attachment_url(get_post_thumbnail_id($post->ID));
+
+		array_push($markers, new Marker(get_the_title($post->ID), get_permalink($post->ID), $dataSplitted, $postThumbnailUrl));
 	}
 
 	$mapId = 'map' . $wp_query->post->ID;

@@ -1,17 +1,12 @@
 function initMap(mapId, markers) {
 	var map = L.mapbox.map(mapId, "tbinna.i80746eh").setView([47.529, 8.54], 2);
 
-	// center map to feature on click
-	map.featureLayer.on("click", function(e) {
-        map.panTo(e.layer.getLatLng());
-    });
-
-	// hide the feature layer on load
-	map.featureLayer.setFilter(function() { return false; });
-
 	// add additional map controls (plugins)
 	L.control.fullscreen().addTo(map);
 	L.control.locate().addTo(map);
+
+	// hide the feature layer on load
+	map.featureLayer.setFilter(function() { return false; });
 
 	map.on("zoomend", function() {
 	    if (map.getZoom() >=13) {
@@ -20,6 +15,11 @@ function initMap(mapId, markers) {
 	        map.featureLayer.setFilter(function() { return false; });
 	    }
 	});
+
+	// center map to feature on click
+	map.featureLayer.on("click", function(e) {
+        map.panTo(e.layer.getLatLng());
+    });
 
 	for (var i = markers.length - 1; i >= 0; i--) {
 		var marker = markers[i];
@@ -30,7 +30,7 @@ function initMap(mapId, markers) {
 				'marker-size': 'large'
 			})
 		})
-		.bindPopup('<b>' + marker.title + '</b><br><a href=\"' + marker.permalink + '\">' + marker.permalink + '</a>')
+		.bindPopup('<h5>' + marker.title + '</h5><p><img src=\"' + marker.postThumbnailUrl + '\" /></p><a href=\"' + marker.permalink + '\">' + marker.permalink + '</a>')
 		.addTo(map);
 	}
 }
