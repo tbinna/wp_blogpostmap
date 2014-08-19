@@ -44,6 +44,11 @@ function blog_post_map_scripts() {
 	wp_enqueue_style('mapbox locate ie', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.21.0/L.Control.Locate.ie.css', array('mapbox locate'), '0.21.0');
 	$wp_styles->add_data( 'mapbox locate ie', 'conditional', 'IE 9' );
 	wp_enqueue_script('mapbox locate', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.24.0/L.Control.Locate.js', array('mapbox'), '0.24.0', false );
+
+	// Mapbox cluster plugin style and script
+	wp_enqueue_style('mapbox marker cluster', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css', array(), '0.4.0');
+	wp_enqueue_style('mapbox marker cluster default', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css', array(), '0.4.0');
+	wp_enqueue_script('mapbox marker cluster', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js', array('mapbox'), '0.4.0', false );
 }
 
 add_action('wp_enqueue_scripts', 'blog_post_map_scripts');

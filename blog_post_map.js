@@ -24,15 +24,21 @@ function initMap(mapId, markers) {
         map.panTo(e.layer.getLatLng());
     });
 
+
+    var clusterGroup = new L.MarkerClusterGroup();
+
 	for (var i = markers.length - 1; i >= 0; i--) {
 		var marker = markers[i];
 
-		L.marker(marker.latLon, {
+		var pin = L.marker(marker.latLon, {
 			icon: L.mapbox.marker.icon({
 				'marker-size': 'large'
 			})
 		})
-		.bindPopup('<h5>' + marker.title + '</h5><p><img src=\"' + marker.postThumbnailUrl + '\" /></p><a href=\"' + marker.permalink + '\">' + marker.permalink + '</a>')
-		.addTo(map);
+		.bindPopup('<h5>' + marker.title + '</h5><p><img src=\"' + marker.postThumbnailUrl + '\" /></p><a href=\"' + marker.permalink + '\">' + marker.permalink + '</a>');
+
+		clusterGroup.addLayer(pin);
 	}
+
+	map.addLayer(clusterGroup);
 }
