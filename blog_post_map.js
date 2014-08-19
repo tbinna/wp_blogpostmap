@@ -32,7 +32,7 @@ function initMap(mapId, markers) {
 
 		var pin = L.marker(marker.latLon, {
 			icon: L.mapbox.marker.icon({
-				'marker-size': 'large'
+				'marker-size': 'medium'
 			})
 		})
 		.bindPopup('<h5>' + marker.title + '</h5><p><img src=\"' + marker.postThumbnailUrl + '\" /></p><a href=\"' + marker.permalink + '\">' + marker.permalink + '</a>');
