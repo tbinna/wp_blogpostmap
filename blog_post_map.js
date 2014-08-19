@@ -29,7 +29,6 @@ function initMap(mapId, markers) {
 
 		L.marker(marker.latLon, {
 			icon: L.mapbox.marker.icon({
-				'marker-symbol': 'star',
 				'marker-size': 'large'
 			})
 		})
