@@ -25,7 +25,9 @@ function initMap(mapId, markers) {
     });
 
 
-    var clusterGroup = new L.MarkerClusterGroup();
+    var clusterGroup = new L.MarkerClusterGroup({
+    	showCoverageOnHover: false
+    });
 
 	for (var i = markers.length - 1; i >= 0; i--) {
 		var marker = markers[i];

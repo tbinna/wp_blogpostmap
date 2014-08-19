@@ -28,8 +28,9 @@ function blog_post_map_scripts() {
 
 	global $wp_styles;
 
-	wp_enqueue_style('blog_post_map', AT_BLOGPOSTMAP_PLUGIN_URL . 'blog_post_map.css');
-	wp_enqueue_script('blog_post_map', AT_BLOGPOSTMAP_PLUGIN_URL . 'blog_post_map.js', array(), false, false );
+	wp_enqueue_style('blog_post_map style', AT_BLOGPOSTMAP_PLUGIN_URL . 'blog_post_map.css');
+	wp_enqueue_style('blog_post_map marker cluster', AT_BLOGPOSTMAP_PLUGIN_URL . 'marker_cluster.css');
+	wp_enqueue_script('blog_post_map script', AT_BLOGPOSTMAP_PLUGIN_URL . 'blog_post_map.js', array(), false, false );
 
 	// Mapbox style and script
 	wp_enqueue_style('mapbox', 'https://api.tiles.mapbox.com/mapbox.js/v2.0.1/mapbox.css', array(), '2.0.1');
@@ -47,7 +48,6 @@ function blog_post_map_scripts() {
 
 	// Mapbox cluster plugin style and script
 	wp_enqueue_style('mapbox marker cluster', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css', array(), '0.4.0');
-	wp_enqueue_style('mapbox marker cluster default', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css', array(), '0.4.0');
 	wp_enqueue_script('mapbox marker cluster', 'https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js', array('mapbox'), '0.4.0', false );
 }
 
